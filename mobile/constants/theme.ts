@@ -48,21 +48,23 @@ export const borderRadius = {
 
 export const typography = {
   display: {
-    fontSize: 34,
-    lineHeight: 40,
-    fontWeight: '700' as const,
+    fontSize: 36,
+    lineHeight: 42,
+    fontWeight: '800' as const,
     color: colors.textPrimary,
+    letterSpacing: -0.5,
   },
   h1: {
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 30,
+    lineHeight: 36,
     fontWeight: '700' as const,
     color: colors.textPrimary,
+    letterSpacing: -0.5,
   },
   h2: {
     fontSize: 24,
     lineHeight: 30,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     color: colors.textPrimary,
   },
   h3: {
@@ -90,10 +92,11 @@ export const typography = {
     color: colors.textMuted,
   },
   label: {
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 18,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     color: colors.textPrimary,
+    letterSpacing: 0.5,
   },
   muted: {
     fontSize: 14,
