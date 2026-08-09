@@ -30,6 +30,7 @@ export const Input: React.FC<InputProps> = ({
   style,
   onFocus,
   onBlur,
+  multiline,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -52,6 +53,7 @@ export const Input: React.FC<InputProps> = ({
       <View
         style={[
           styles.inputWrapper,
+          multiline ? styles.multilineWrapper : null,
           isFocused && styles.inputWrapperFocused,
           error ? styles.inputWrapperError : null,
           disabled ? styles.inputWrapperDisabled : null,
@@ -60,12 +62,13 @@ export const Input: React.FC<InputProps> = ({
         {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
 
         <TextInput
-          style={[styles.input, style]}
+          style={[styles.input, multiline ? styles.multilineInput : null, style]}
           placeholderTextColor={colors.textMuted}
           editable={!disabled}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          multiline={multiline}
           {...props}
         />
 
@@ -115,6 +118,12 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.medium,
     paddingHorizontal: spacing.md,
   },
+  multilineWrapper: {
+    height: 'auto',
+    minHeight: 90,
+    alignItems: 'flex-start',
+    paddingVertical: spacing.sm,
+  },
   inputWrapperFocused: {
     borderColor: colors.inputBorderFocused,
   },
@@ -129,6 +138,9 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.textPrimary,
     fontSize: 15,
+  },
+  multilineInput: {
+    textAlignVertical: 'top',
   },
   iconLeft: {
     marginRight: spacing.sm,

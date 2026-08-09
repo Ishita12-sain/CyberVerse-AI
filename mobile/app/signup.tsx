@@ -15,24 +15,75 @@ import { Text } from '../components/ui/Text';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Divider } from '../components/ui/Divider';
+import { ProgressBar } from '../components/ui/ProgressBar';
 import { AuthBackground } from '../components/auth/AuthBackground';
 import { PasswordInput } from '../components/auth/PasswordInput';
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const router = useRouter();
 
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [fullNameError, setFullNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [infoMessage, setInfoMessage] = useState('');
 
+  // Password Requirement Checks
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*]/.test(password);
+
+  const requirementsList = [
+    { label: 'At least 8 characters', satisfied: hasMinLength },
+    { label: 'Uppercase letter', satisfied: hasUppercase },
+    { label: 'Lowercase letter', satisfied: hasLowercase },
+    { label: 'Number', satisfied: hasNumber },
+    { label: 'Special character (!@#$%^&*)', satisfied: hasSpecialChar },
+  ];
+
+  const satisfiedCount = requirementsList.filter((r) => r.satisfied).length;
+
+  let strengthLabel = 'Weak';
+  let strengthColor: string = colors.error;
+  let progressVariant: 'default' | 'success' | 'warning' = 'warning';
+
+  if (satisfiedCount >= 5) {
+    strengthLabel = 'Strong';
+    strengthColor = colors.success;
+    progressVariant = 'success';
+  } else if (satisfiedCount >= 3) {
+    strengthLabel = 'Medium';
+    strengthColor = colors.warning;
+    progressVariant = 'warning';
+  } else {
+    strengthLabel = 'Weak';
+    strengthColor = colors.error;
+    progressVariant = 'warning';
+  }
+
   const validate = () => {
     let valid = true;
+    setFullNameError('');
     setEmailError('');
     setPasswordError('');
+    setConfirmPasswordError('');
+
+    if (!fullName.trim()) {
+      setFullNameError('Full name is required.');
+      valid = false;
+    } else if (fullName.trim().length < 2) {
+      setFullNameError('Name must be at least 2 characters.');
+      valid = false;
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
@@ -46,15 +97,23 @@ export default function LoginScreen() {
     if (!password) {
       setPasswordError('Password is required.');
       valid = false;
-    } else if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters.');
+    } else if (satisfiedCount < 5) {
+      setPasswordError('Password does not satisfy all security requirements.');
+      valid = false;
+    }
+
+    if (!confirmPassword) {
+      setConfirmPasswordError('Please confirm your password.');
+      valid = false;
+    } else if (confirmPassword !== password) {
+      setConfirmPasswordError('Passwords do not match.');
       valid = false;
     }
 
     return valid;
   };
 
-  const handleSignIn = () => {
+  const handleSignUp = () => {
     setInfoMessage('');
     if (!validate()) return;
 
@@ -99,26 +158,35 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Vertically Centered Main Container */}
             <View style={styles.centerWrapper}>
               <Card elevated style={styles.authPanel}>
-                {/* Panel Corner Accent Lines */}
+                {/* HUD Corner Accents */}
                 <View style={[styles.cornerBracket, styles.topLeftBracket]} />
                 <View style={[styles.cornerBracket, styles.topRightBracket]} />
                 <View style={[styles.cornerBracket, styles.bottomLeftBracket]} />
                 <View style={[styles.cornerBracket, styles.bottomRightBracket]} />
 
-                {/* Form Heading */}
+                {/* Heading */}
                 <View style={styles.headingBox}>
                   <Text variant="h1" align="center" style={styles.headingTitle}>
-                    WELCOME BACK
+                    CREATE ACCOUNT
                   </Text>
                   <Text variant="body" align="center" style={styles.headingSubtitle}>
-                    Continue your journey through CyberVerse.
+                    Start your CyberVerse journey.
                   </Text>
                 </View>
 
-                {/* Login Form Fields */}
+                {/* Form Fields */}
+                <Input
+                  label="FULL NAME"
+                  placeholder="Enter your name"
+                  value={fullName}
+                  onChangeText={setFullName}
+                  error={fullNameError}
+                  autoCapitalize="words"
+                  style={styles.inputField}
+                />
+
                 <Input
                   label="EMAIL"
                   placeholder="Enter your email"
@@ -133,23 +201,64 @@ export default function LoginScreen() {
 
                 <PasswordInput
                   label="PASSWORD"
-                  placeholder="Enter your password"
+                  placeholder="Create a password"
                   value={password}
                   onChangeText={setPassword}
                   error={passwordError}
                   style={styles.inputField}
                 />
 
-                <View style={styles.forgotRow}>
-                  <Pressable
-                    onPress={() => setInfoMessage('Password reset flow will be connected in a future update.')}
-                    accessibilityRole="button"
-                  >
-                    <Text variant="caption" color={colors.accent} style={styles.forgotText}>
-                      Forgot password?
-                    </Text>
-                  </Pressable>
-                </View>
+                {/* Password Strength & Real-time Indicator Box */}
+                {password.length > 0 && (
+                  <View style={styles.strengthBox}>
+                    <View style={styles.strengthHeaderRow}>
+                      <Text variant="caption" color={colors.textMuted} style={styles.strengthTitle}>
+                        PASSWORD STRENGTH
+                      </Text>
+                      <Text variant="label" color={strengthColor} style={styles.strengthBadge}>
+                        {strengthLabel}
+                      </Text>
+                    </View>
+
+                    <ProgressBar
+                      progress={(satisfiedCount / 5) * 100}
+                      variant={progressVariant}
+                      height={4}
+                      style={styles.progressBar}
+                    />
+
+                    {/* Requirements Checklist */}
+                    <View style={styles.requirementsContainer}>
+                      {requirementsList.map((req, idx) => (
+                        <View key={idx} style={styles.reqRow}>
+                          <Text
+                            variant="caption"
+                            color={req.satisfied ? colors.success : colors.textMuted}
+                            style={styles.reqIcon}
+                          >
+                            {req.satisfied ? '✓' : '○'}
+                          </Text>
+                          <Text
+                            variant="caption"
+                            color={req.satisfied ? colors.textPrimary : colors.textMuted}
+                            style={styles.reqText}
+                          >
+                            {req.label}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                <PasswordInput
+                  label="CONFIRM PASSWORD"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  error={confirmPasswordError}
+                  style={styles.inputField}
+                />
 
                 {infoMessage ? (
                   <View style={styles.infoBanner}>
@@ -159,40 +268,21 @@ export default function LoginScreen() {
                   </View>
                 ) : null}
 
-                {/* Sign In Primary CTA */}
                 <Button
-                  title="SIGN IN →"
+                  title="CREATE ACCOUNT →"
                   variant="primary"
                   loading={loading}
-                  onPress={handleSignIn}
-                  style={styles.signInButton}
+                  onPress={handleSignUp}
+                  style={styles.signUpButton}
                 />
 
-                {/* Divider */}
-                <View style={styles.dividerRow}>
-                  <Divider style={styles.dividerLine} />
-                  <Text variant="caption" color={colors.textMuted} style={styles.dividerText}>
-                    OR
-                  </Text>
-                  <Divider style={styles.dividerLine} />
-                </View>
-
-                {/* Google Placeholder Button */}
-                <Button
-                  title="Continue with Google"
-                  variant="outline"
-                  onPress={() => setInfoMessage('Google sign-in placeholder only. Auth will be connected next.')}
-                  style={styles.googleButton}
-                />
-
-                {/* Switch Account */}
                 <View style={styles.switchRow}>
                   <Text variant="body" color={colors.textMuted} style={styles.switchText}>
-                    New to CyberVerse?{' '}
+                    Already have an account?{' '}
                   </Text>
-                  <Pressable onPress={() => router.push('/signup')} accessibilityRole="button">
+                  <Pressable onPress={() => router.push('/login')} accessibilityRole="button">
                     <Text variant="bodyMedium" color={colors.accent} style={styles.switchLink}>
-                      Create account
+                      Sign In
                     </Text>
                   </Pressable>
                 </View>
@@ -248,7 +338,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center', // Vertically center content
+    justifyContent: 'center',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
   },
@@ -258,8 +348,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   authPanel: {
-    backgroundColor: '#0D1322', // Dark elevated surface
-    borderColor: 'rgba(168, 85, 247, 0.35)', // Purple/blue border
+    backgroundColor: '#0D1322',
+    borderColor: 'rgba(168, 85, 247, 0.35)',
     borderRadius: borderRadius.large,
     padding: spacing.lg,
     position: 'relative',
@@ -309,8 +399,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   headingTitle: {
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 26,
+    lineHeight: 32,
     fontWeight: '900',
     letterSpacing: 1,
     color: colors.textPrimary,
@@ -321,16 +411,49 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   inputField: {
-    fontSize: 16,
+    fontSize: 15,
   },
-  forgotRow: {
-    alignItems: 'flex-end',
+  strengthBox: {
+    backgroundColor: 'rgba(15, 23, 42, 0.7)',
+    borderRadius: borderRadius.small,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.25)',
+    padding: spacing.sm,
     marginBottom: spacing.md,
     marginTop: -spacing.xs,
   },
-  forgotText: {
-    fontSize: 12,
-    fontWeight: '700',
+  strengthHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs / 2,
+  },
+  strengthTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  strengthBadge: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  progressBar: {
+    marginBottom: spacing.xs,
+  },
+  requirementsContainer: {
+    gap: 2,
+  },
+  reqRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reqIcon: {
+    fontSize: 11,
+    marginRight: spacing.xs,
+    width: 12,
+  },
+  reqText: {
+    fontSize: 11,
   },
   infoBanner: {
     padding: spacing.sm,
@@ -340,7 +463,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(56, 189, 248, 0.3)',
     marginBottom: spacing.md,
   },
-  signInButton: {
+  signUpButton: {
     height: 52,
     backgroundColor: '#8B5CF6',
     borderRadius: borderRadius.medium,
@@ -349,26 +472,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 6,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: spacing.md,
-  },
-  dividerLine: {
-    flex: 1,
-    marginVertical: 0,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  dividerText: {
-    marginHorizontal: spacing.md,
-    fontWeight: '700',
-  },
-  googleButton: {
-    height: 48,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-    backgroundColor: 'rgba(255, 255, 255, 0.025)',
-    borderRadius: borderRadius.medium,
+    marginTop: spacing.xs,
   },
   switchRow: {
     flexDirection: 'row',

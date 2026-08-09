@@ -9,7 +9,8 @@ import {
   View,
   StyleProp,
 } from 'react-native';
-import { colors, spacing, borderRadius } from '../../constants/theme';
+import { spacing, borderRadius } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { Text } from './Text';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -24,30 +25,6 @@ export interface ButtonProps extends Omit<PressableProps, 'style'> {
   style?: StyleProp<ViewStyle>;
 }
 
-const variantViewStyles: Record<ButtonVariant, ViewStyle> = {
-  primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: colors.secondary },
-  outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
-  ghost: { backgroundColor: 'transparent' },
-  danger: { backgroundColor: colors.error },
-};
-
-const variantPressedViewStyles: Record<ButtonVariant, ViewStyle> = {
-  primary: { backgroundColor: '#4F46E5' },
-  secondary: { backgroundColor: '#7C3AED' },
-  outline: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: colors.textMuted },
-  ghost: { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
-  danger: { backgroundColor: '#DC2626' },
-};
-
-const variantTextStyles: Record<ButtonVariant, TextStyle> = {
-  primary: { color: colors.textPrimary },
-  secondary: { color: colors.textPrimary },
-  outline: { color: colors.textPrimary },
-  ghost: { color: colors.textSecondary },
-  danger: { color: colors.textPrimary },
-};
-
 export const Button: React.FC<ButtonProps> = ({
   title,
   variant = 'primary',
@@ -59,7 +36,32 @@ export const Button: React.FC<ButtonProps> = ({
   onPress,
   ...props
 }) => {
+  const { colors: activeColors } = useTheme();
   const isInteractive = !disabled && !loading;
+
+  const variantViewStyles: Record<ButtonVariant, ViewStyle> = {
+    primary: { backgroundColor: activeColors.primary },
+    secondary: { backgroundColor: activeColors.secondary },
+    outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: activeColors.border },
+    ghost: { backgroundColor: 'transparent' },
+    danger: { backgroundColor: activeColors.error },
+  };
+
+  const variantPressedViewStyles: Record<ButtonVariant, ViewStyle> = {
+    primary: { backgroundColor: activeColors.primaryDark },
+    secondary: { backgroundColor: activeColors.secondaryDark },
+    outline: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: activeColors.textMuted },
+    ghost: { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
+    danger: { backgroundColor: activeColors.error },
+  };
+
+  const variantTextStyles: Record<ButtonVariant, TextStyle> = {
+    primary: { color: activeColors.textInverse },
+    secondary: { color: activeColors.textPrimary },
+    outline: { color: activeColors.textPrimary },
+    ghost: { color: activeColors.textSecondary },
+    danger: { color: activeColors.textPrimary },
+  };
 
   return (
     <Pressable
@@ -79,7 +81,7 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' || variant === 'ghost' ? colors.primary : colors.textPrimary}
+          color={variant === 'outline' || variant === 'ghost' ? activeColors.primary : activeColors.textPrimary}
         />
       ) : (
         <View style={styles.contentContainer}>
@@ -88,7 +90,7 @@ export const Button: React.FC<ButtonProps> = ({
             variant="label"
             style={[
               variantTextStyles[variant],
-              disabled ? styles.disabledText : null,
+              disabled ? { color: activeColors.textMuted } : null,
             ]}
           >
             {title}
@@ -122,8 +124,5 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
-  },
-  disabledText: {
-    color: colors.textMuted,
   },
 });

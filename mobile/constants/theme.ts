@@ -1,29 +1,97 @@
-export const colors = {
-  // Base Palette
-  background: '#080B14',
-  surface: '#111827',
-  surfaceElevated: '#172033',
-  primary: '#6366F1',
-  secondary: '#8B5CF6',
+export interface ColorTokens {
+  primary: string;
+  primaryLight: string;
+  primaryDark: string;
+  secondary: string;
+  secondaryLight: string;
+  secondaryDark: string;
+  background: string;
+  surface: string;
+  surfaceElevated: string;
+  surfaceOverlay: string;
+  border: string;
+  borderHighlight: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  textInverse: string;
+  accent: string;
+  accentGlow: string;
+  success: string;
+  warning: string;
+  error: string;
+  badgeAiBg: string;
+  badgeAiText: string;
+  badgeAiBorder: string;
+  badgeAiBackground: string;
+  inputBackground: string;
+  inputBorder: string;
+  inputBorderFocused: string;
+}
+
+export const darkColors: ColorTokens = {
+  primary: '#8B5CF6',
+  primaryLight: '#A78BFA',
+  primaryDark: '#7C3AED',
+  secondary: '#6366F1',
+  secondaryLight: '#818CF8',
+  secondaryDark: '#4F46E5',
+  background: '#070B16',
+  surface: '#0D1322',
+  surfaceElevated: '#131B2E',
+  surfaceOverlay: 'rgba(5, 8, 16, 0.85)',
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderHighlight: 'rgba(99, 102, 241, 0.4)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#94A3B8',
+  textMuted: '#64748B',
+  textInverse: '#070B16',
   accent: '#38BDF8',
+  accentGlow: 'rgba(56, 189, 248, 0.15)',
   success: '#22C55E',
   warning: '#F59E0B',
   error: '#EF4444',
-  textPrimary: '#F8FAFC',
-  textSecondary: '#CBD5E1',
-  textMuted: '#94A3B8',
-  border: '#263248',
+  badgeAiBg: 'rgba(139, 92, 246, 0.15)',
+  badgeAiText: '#A78BFA',
+  badgeAiBorder: 'rgba(139, 92, 246, 0.4)',
+  badgeAiBackground: 'rgba(139, 92, 246, 0.15)',
+  inputBackground: '#0D1322',
+  inputBorder: 'rgba(255, 255, 255, 0.08)',
+  inputBorderFocused: '#8B5CF6',
+};
 
-  // Semantic Aliases
-  cardBackground: '#111827',
-  cardBackgroundElevated: '#172033',
-  inputBackground: '#111827',
-  inputBorder: '#263248',
-  inputBorderFocused: '#6366F1',
-  badgeAiBackground: 'rgba(99, 102, 241, 0.15)',
-  badgeAiBorder: '#6366F1',
-  badgeAiText: '#38BDF8',
-} as const;
+export const lightColors: ColorTokens = {
+  primary: '#7C3AED',
+  primaryLight: '#8B5CF6',
+  primaryDark: '#6D28D9',
+  secondary: '#4F46E5',
+  secondaryLight: '#6366F1',
+  secondaryDark: '#4338CA',
+  background: '#F8FAFC',
+  surface: '#FFFFFF',
+  surfaceElevated: '#F1F5F9',
+  surfaceOverlay: 'rgba(15, 23, 42, 0.65)',
+  border: '#E2E8F0',
+  borderHighlight: 'rgba(124, 58, 237, 0.35)',
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  textMuted: '#64748B',
+  textInverse: '#FFFFFF',
+  accent: '#0284C7',
+  accentGlow: 'rgba(2, 132, 199, 0.12)',
+  success: '#16A34A',
+  warning: '#D97706',
+  error: '#DC2626',
+  badgeAiBg: 'rgba(124, 58, 237, 0.1)',
+  badgeAiText: '#7C3AED',
+  badgeAiBorder: 'rgba(124, 58, 237, 0.3)',
+  badgeAiBackground: 'rgba(124, 58, 237, 0.1)',
+  inputBackground: '#FFFFFF',
+  inputBorder: '#E2E8F0',
+  inputBorderFocused: '#7C3AED',
+};
+
+export const colors = darkColors;
 
 export const spacing = {
   xs: 4,

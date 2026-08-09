@@ -7,7 +7,8 @@ import {
   PressableProps,
   StyleProp,
 } from 'react-native';
-import { colors, spacing, borderRadius, elevation } from '../../constants/theme';
+import { spacing, borderRadius, elevation } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 
 export interface CardProps {
   children: React.ReactNode;
@@ -24,9 +25,17 @@ export const Card: React.FC<CardProps> = ({
   style,
   testID,
 }) => {
-  const cardStyle: StyleProp<ViewStyle> = [
+  const { colors: activeColors } = useTheme();
+
+  const dynamicStyle: ViewStyle = {
+    backgroundColor: elevated ? activeColors.surfaceElevated : activeColors.surface,
+    borderColor: activeColors.border,
+  };
+
+  const cardStyle = [
     styles.card,
-    elevated ? styles.elevated : styles.standard,
+    dynamicStyle,
+    elevated ? elevation.subtle : null,
     style,
   ];
 
@@ -58,15 +67,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.large,
     padding: spacing.lg,
     borderWidth: 1,
-  },
-  standard: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-  },
-  elevated: {
-    backgroundColor: colors.surfaceElevated,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    ...elevation.subtle,
   },
   pressed: {
     opacity: 0.9,
