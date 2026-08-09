@@ -25,7 +25,8 @@ export class SessionService {
       startedAt: new Date().toISOString(),
       currentQuestion: 1,
       xp: 0,
-      riskScore: 0
+      riskScore: 0,
+      answerHistory: []
     };
 
     inMemorySessions.set(sessionId, newSession);

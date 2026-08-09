@@ -3,7 +3,7 @@ import { SessionService } from './session.service';
 
 const sessionService = new SessionService();
 
-const MOCK_QUESTIONS: Question[] = [
+export const MOCK_QUESTIONS: Question[] = [
   {
     id: 'question-001',
     missionId: 'mission-001',
@@ -48,15 +48,16 @@ const MOCK_QUESTIONS: Question[] = [
   }
 ];
 
-// In-memory record of answered questions per session: sessionId -> Set of questionIds
-const sessionAnswers: Map<string, Set<string>> = new Map();
-
 export interface SubmitAnswerResponse {
   errorType?: 'SESSION_NOT_FOUND' | 'SESSION_INACTIVE' | 'QUESTION_NOT_FOUND' | 'QUESTION_MISMATCH' | 'DUPLICATE_ANSWER';
   result?: AnswerResult;
 }
 
 export class AnswerService {
+  public async getQuestionsByMission(missionId: string): Promise<Question[]> {
+    return MOCK_QUESTIONS.filter(q => q.missionId === missionId);
+  }
+
   public async submitAnswer(
     sessionId: string,
     questionId: string,
@@ -84,11 +85,9 @@ export class AnswerService {
     }
 
     // 4. Prevent duplicate answers
-    if (!sessionAnswers.has(sessionId)) {
-      sessionAnswers.set(sessionId, new Set());
-    }
-    const answeredSet = sessionAnswers.get(sessionId)!;
-    if (answeredSet.has(questionId)) {
+    const history = session.answerHistory || [];
+    const isAlreadyAnswered = history.some(entry => entry.questionId === questionId);
+    if (isAlreadyAnswered) {
       return { errorType: 'DUPLICATE_ANSWER' };
     }
 
@@ -106,15 +105,16 @@ export class AnswerService {
     // Calculate next question index
     const nextQuestion = session.currentQuestion + 1;
 
+    // Update answer history array
+    const updatedHistory = [...history, { questionId, correct: isCorrect }];
+
     // 6. Update session
     await sessionService.updateSession(sessionId, {
       xp: newXp,
       riskScore: newRiskScore,
-      currentQuestion: nextQuestion
+      currentQuestion: nextQuestion,
+      answerHistory: updatedHistory
     });
-
-    // Mark as answered
-    answeredSet.add(questionId);
 
     return {
       result: {
