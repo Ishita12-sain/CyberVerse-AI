@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "build": "rimraf dist && tsc",
     "start": "node dist/server.js"
   },
   "dependencies": {
